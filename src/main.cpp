@@ -8,7 +8,8 @@ static int16_t neopixcelPins[] = {3, 4, 5, 11};
 static uint8_t neopixcelLen = sizeof(neopixcelPins) / sizeof(neopixcelPins[0]);
 static uint8_t readStatePins[] = {20, 26, 28};
 static uint8_t readStateLen = sizeof(readStatePins) / sizeof(readStatePins[0]);
-
+static unsigned long timeStart = millis();
+static unsigned long timeEnd = millis();
 // NeoPixcelライブラリの設定、このまま書いておく-----------------------
 // NeoPixel用の stripオブジェクトを宣言（LEO_GRB + NEO_KHZ800 は NeoPixel WS2812 使用の場合の設定）
 
@@ -50,21 +51,27 @@ void loop()
 
   // Serial.print(readPin0);
   // Serial.println(readPin1);
+  timeEnd = millis();
   if (digitalRead(readStatePins[2]))
   {
+    timeStart = millis();
     colorState = {0, 0, 0};
     Serial.println("off");
   }
+  else if(timeEnd-timeStart<1000){
+    colorState = {0, 0, 0};
+    Serial.println("fakeoff");
+  }
   else if (readPin1)
   {
-    colorState = {30, 0, 0};
+    colorState = {255,30,30};
     Serial.println("red");
   }
   else if (readPin0)
   {
-    colorState = {0, 0, 30};
+    colorState = {30, 30, 255};
     Serial.println("blue");
-  }
+  }                                                                                         
 
   // for文で全てのNeoPixelのRGB（赤緑青）の明るさを0〜255（30程でも十分明るい）で指定
   for (uint8_t len = 0; len < neopixcelLen; len++)
